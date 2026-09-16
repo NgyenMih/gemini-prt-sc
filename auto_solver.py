@@ -3,46 +3,55 @@ import time
 from PIL import ImageGrab, Image
 from google import genai
 
-# Thay trực tiếp API Key của bạn vào giữa 2 dấu ngoặc kép bên dưới
-API_KEY = "AIzaSy..." 
+# === CHỈ ĐỀN API KEY CỦA BẠN VÀO DÒNG NÀY (GIỮ NGUYÊN DẤU NGOẶC KÉP) ===
+API_KEY = "DÁN_API_KEY_CỦA_BẠN_VÀO_ĐÂY"
 
-client = genai.Client(api_key=API_KEY)
-last_image = None
 
-print("==================================================")
-print("   GEMINI CLIPBOARD AUTO SOLVER")
-print("==================================================")
-print("[*] Đang lắng nghe khay nhớ tạm (Clipboard)...")
-print("[*] Nhấn (Win + Shift + S) để chụp câu hỏi trên màn hình.")
-print("[*] Nhấn Ctrl + C trong cửa sổ này để dừng chương trình.\n")
+def main():
+    if not API_KEY or API_KEY == "DÁN_API_KEY_CỦA_BẠN_VÀO_ĐÂY":
+        print("[!] Cảnh báo: Vui lòng dán API Key vào dòng 6 trước khi chạy.")
+        return
 
-while True:
-    try:
-        img = ImageGrab.grabclipboard()
-        
-        if isinstance(img, Image.Image) and img != last_image:
-            last_image = img
-            print("[+] Đã phát hiện ảnh mới! Đang xử lý qua Gemini API...")
+    client = genai.Client(api_key=API_KEY)
+    last_image = None
 
-            prompt = (
-                "Hãy đọc và giải câu hỏi trong ảnh theo cấu trúc:\n"
-                "1. Đáp án đúng: [Chọn đáp án]\n"
-                "2. Giải thích ngắn gọn trong 1-2 câu."
-            )
+    print("==================================================")
+    print("   GEMINI CLIPBOARD AUTO SOLVER (v3.6-flash)")
+    print("==================================================")
+    print("[*] Đang lắng nghe khay nhớ tạm (Clipboard)...")
+    print("[*] Nhấn (Win + Shift + S) để chụp câu hỏi trên màn hình.")
+    print("[*] Nhấn Ctrl + C trong cửa sổ này để dừng chương trình.\n")
 
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=[img, prompt]
-            )
+    while True:
+        try:
+            img = ImageGrab.grabclipboard()
+            
+            if isinstance(img, Image.Image) and img != last_image:
+                last_image = img
+                print("[+] Đã phát hiện ảnh mới! Đang xử lý qua Gemini API...")
 
-            print("\n---------------- KẾT QUẢ ----------------")
-            print(response.text)
-            print("-----------------------------------------\n")
+                prompt = (
+                    "Hãy đọc và giải câu hỏi trong ảnh theo cấu trúc:\n"
+                    "1. Đáp án đúng: [Chọn đáp án]\n"
+                    "2. Giải thích ngắn gọn trong 1-2 câu."
+                )
 
-    except KeyboardInterrupt:
-        print("\n[*] Đã dừng chương trình.")
-        break
-    except Exception as e:
-        print(f"[!] Lỗi: {e}")
-        
-    time.sleep(1)
+                response = client.models.generate_content(
+                    model="gemini-3.6-flash",
+                    contents=[img, prompt]
+                )
+
+                print("\n---------------- KẾT QUẢ ----------------")
+                print(response.text)
+                print("-----------------------------------------\n")
+
+        except KeyboardInterrupt:
+            print("\n[*] Đã dừng chương trình.")
+            break
+        except Exception as e:
+            print(f"[!] Lỗi: {e}")
+            
+        time.sleep(1)
+
+if __name__ == "__main__":
+    main()
